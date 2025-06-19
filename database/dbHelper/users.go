@@ -46,7 +46,31 @@ func CreateUserSession(userID string) (string, error) {
 	return sessionID, crtErr
 }
 
+func IsValidSession(token string) (bool, error) {
+	var exists bool
+	query := `SELECT EXISTS (SELECT 1 FROM user_session WHERE id = $1 AND (archived_at) > $2 )`
+	err := database.Todo.QueryRow(query, token, time.Now()).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+
 func LogoutSession(token string) error {
 	_, err := database.Todo.Query("UPDATE user_session SET archived_at=$1 WHERE  id=$2", time.Now(), token)
+	return err
+}
+
+func GetProfileDetails(token string, profile *models.ProfileRequest) error {
+	query := `
+		SELECT u.id, u.name, u.email
+		FROM user_session s
+		JOIN users u ON s.user_id = u.id
+		WHERE s.id = $1 
+		LIMIT 1;
+	`
+	err := database.Todo.QueryRow(query, token).Scan(
+		&profile.ID, &profile.Name, &profile.Email,
+	)
 	return err
 }

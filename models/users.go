@@ -21,3 +21,16 @@ type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type ProfileRequest struct {
+	ID    string `json:"id"`
+	Name  string `json:"username"`
+	Email string `json:"email"`
+}
+
+type ProfileResponse struct {
+	Message string `json:"Message"`
+	ID      string `json:"Id"`
+	Name    string `json:"Name"`
+	Email   string `json:"Email"`
+}

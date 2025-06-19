@@ -25,14 +25,14 @@ func SetupRoutes() http.Handler {
 	r.HandleFunc("/logout", handlers.LogoutUser).Methods("POST")
 
 	// Profile
-	r.HandleFunc("/profile", handlers.Profile).Methods("GET")
+	r.HandleFunc("/profile", handlers.GetUserProfile).Methods("GET")
 
-	//// Task Routes (Protected)
-	//r.HandleFunc("/tasks", handlers.CreateTask).Methods("POST")
-	//r.HandleFunc("/tasks", handlers.GetTasks).Methods("GET")
-	//r.HandleFunc("/tasks/{id}", handlers.UpdateTask).Methods("PUT")
-	//r.HandleFunc("/tasks/{id}", handlers.DeleteTask).Methods("DELETE")
-	//r.HandleFunc("/tasks/{id}/status", handlers.ChangeStatusHandler(db)).Methods("PATCH")
+	// Task Routes (Protected)
+	r.HandleFunc("/tasks", handlers.CreateTask).Methods("POST")
+	r.HandleFunc("/tasks", handlers.GetTasks).Methods("GET")
+	r.HandleFunc("/tasks/update", handlers.UpdateTask).Methods("PUT")
+	r.HandleFunc("/tasks/update/status", handlers.UpdateTaskStatus).Methods("PATCH")
+	//r.HandleFunc("/tasks", handlers.DeleteTask).Methods("DELETE")
 
 	return r
 }

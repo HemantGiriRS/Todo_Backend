@@ -77,14 +77,25 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func LogoutUser(w http.ResponseWriter, r *http.Request) {
+	//get sesion token
 	token := r.Header.Get("Session-Token")
 	//check token
 	if token == "" {
 		logrus.Errorf("Failed to get token")
 		return
 	}
-	//if err:=dbHelper.IsValidSession()
-	//log out
+	//check session
+	var isExists bool
+	isExists, err := dbHelper.IsValidSession(token)
+	if err != nil {
+		logrus.Println("Failed in validation of session %v ", err, http.StatusInternalServerError)
+		return
+	}
+	if !isExists {
+		logrus.Println("Session does not exist")
+		return
+	}
+	//logout
 	if err := dbHelper.LogoutSession(token); err != nil {
 		logrus.Println("Failed to logout session")
 		return
@@ -94,12 +105,38 @@ func LogoutUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"Message": "User Logout Successfully..."})
 }
 
-func Profile(w http.ResponseWriter, r *http.Request) {
+func GetUserProfile(w http.ResponseWriter, r *http.Request) {
+	//get session token
 	token := r.Header.Get("Session-Token")
 	//check token
 	if token == "" {
 		logrus.Errorf("Failed to get token")
 		return
 	}
+	//check session
+	var isExists bool
+	isExists, err := dbHelper.IsValidSession(token)
+	if err != nil {
+		logrus.Println("Failed in validation of session ", err, http.StatusInternalServerError)
+		return
+	}
+	if !isExists {
+		logrus.Println("Session does not exist")
+		return
+	}
+	var usr models.ProfileRequest
+	if err := dbHelper.GetProfileDetails(token, &usr); err != nil {
+		logrus.Println("Failed to get user profile details", err)
+	}
 
+	//response
+	response := models.ProfileResponse{
+		Message: "User Profile loaded Successfully...",
+		ID:      usr.ID,
+		Name:    usr.Name,
+		Email:   usr.Email,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }

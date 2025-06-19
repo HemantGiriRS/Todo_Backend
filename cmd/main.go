@@ -26,14 +26,15 @@ func main() {
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASSWORD"),
 		database.SSLModeDisable); err != nil {
-		logrus.Errorf("Failed to initialize and migrate database with error: %+v", err)
+		logrus.Errorf("Failed to initialize and migrate database with error: %v", err)
 	}
-	defer database.Todo.Close()
+
+	//defer database.Todo.Close()
 
 	// run server
 	r := server.SetupRoutes()
 	fmt.Println("server running on port http://localhost:8080")
 	if err := http.ListenAndServe(":"+string(os.Getenv("PORT")), r); err != nil {
-		logrus.Errorf("Failed to start server with error: %+v", err)
+		logrus.Errorf("Failed to start server with error: %v", err)
 	}
 }
